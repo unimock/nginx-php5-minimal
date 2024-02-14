@@ -1,16 +1,5 @@
 version: '2'
 services:
-  mysql:
-    image: mariadb
-    restart: unless-stopped
-    environment:
-      - MYSQL_ROOT_PASSWORD=password
-      - TZ=Europe/Berlin
-      - MYSQL_DATABASE=prolife
-    expose:
-      - 3306
-    volumes:
-      - ./persistent/mysql:/var/lib/mysql
   php5:
     ##################################################
     # BUILD section
@@ -20,38 +9,9 @@ services:
       dockerfile: Dockerfile
       args:
         BUILD_TZ: Europe/Berlin
-        BUILD_PRINTING: "yes"
-        BUILD_LATEX:    "yes"
-        BUILD_MYSQLCLI: "yes"
-    ##################################################
-    # RUN section
-    ##################################################
-    image: unimock/nginx-php5:0.2.0
-    container_name: prolife
-    restart: unless-stopped
-    hostname: prolife
-    environment:
-     # disable services : cron
-     - DISABLED_SERVICES=
-    volumes:
-      - ./persistent/html:/usr/share/nginx/html
-      - ./service:/service
-    ports:
-      - "80:80"
-    depends_on:
-      - mysql
-
-  phpmyadmin:
-    image: phpmyadmin/phpmyadmin
-    container_name: phpmyadmin
-    restart: unless-stopped
-    environment:
-      - PMA_ARBITRARY=0
-      - PMA_HOST=mysql
-      - PMA_USER=root
-      - PMA_PASSWORD=password
-    ports:
-      - "81:80"
-    depends_on:
-      - mysql
+      x-bake:
+        platforms:
+          - linux/amd64
+          - linux/arm64
+    image: unimock/nginx-php5-minimal:0.0.0
 
